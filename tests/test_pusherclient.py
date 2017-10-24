@@ -4,7 +4,7 @@ import sys
 import time
 import threading
 
-import pusherclient
+import pysher
 import pusherserver
 
 try:
@@ -28,6 +28,7 @@ ERR_TIMEOUT = 2
 global client
 global server
 global exit_code
+
 
 def test_channel_callback(data):
     global exit_code
@@ -56,6 +57,7 @@ def stop_test():
     client.disconnect()
     server.stop(fromThread=True)
 
+
 if __name__ == '__main__':
     global client
     global server
@@ -71,8 +73,8 @@ if __name__ == '__main__':
 
     # Set up our client and attempt to connect to the server
     appkey = 'appkey'
-    pusherclient.Pusher.host = "127.0.0.1"
-    client = pusherclient.Pusher(appkey, port=PORT, secure=False, reconnect_interval=1)
+    pysher.Pusher.host = "127.0.0.1"
+    client = pysher.Pusher(appkey, port=PORT, secure=False, reconnect_interval=1)
 
     print(client._build_url("mykey", False, port=PORT))
     client.connection.bind('pusher:connection_established', connect_handler)
