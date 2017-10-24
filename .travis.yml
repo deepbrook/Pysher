@@ -1,12 +1,7 @@
 language: python
 python:
-  - "2.6"
-  - "2.7"
-  # Disable testing 3.2 since autobahn uses unicode literal syntax that wasn't
-  # re-added into 3.3.  See PEP 414
-#  - "3.2"
-  - "3.3"
-  - "3.4"
+  - "3.5"
+  - "3.6"
 install:
   - pip install .
   # Our test server uses autobahn
