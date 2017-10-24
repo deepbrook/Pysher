@@ -10,7 +10,8 @@ except ImportError:
 
 
 class Connection(Thread):
-    def __init__(self, event_handler, url, log_level=logging.INFO, daemon=True, reconnect_interval=10):
+    def __init__(self, event_handler, url, log_level=logging.INFO, daemon=True,
+                 reconnect_interval=10, **thread_kwargs):
         self.event_handler = event_handler
         self.url = url
 
@@ -56,10 +57,10 @@ class Connection(Thread):
         self.ping_interval = 120
         self.ping_timer = None
 
-        Thread.__init__(self)
+        Thread.__init__(self, **thread_kwargs)
         self.daemon = daemon
 
-    def bind(self, event_name, callback):
+    def bind(self, event_name, callback, *args, **kwargs):
         """Bind an event to a callback
 
         :param event_name: The name of the event to bind to.
@@ -71,7 +72,7 @@ class Connection(Thread):
         if event_name not in self.event_callbacks.keys():
             self.event_callbacks[event_name] = []
 
-        self.event_callbacks[event_name].append(callback)
+        self.event_callbacks[event_name].append((callback, args, kwargs))
 
     def disconnect(self):
         self.needs_reconnect = False
@@ -143,9 +144,10 @@ class Connection(Thread):
             if 'channel' not in params.keys():
                 # We've got a connection event.  Lets handle it.
                 if params['event'] in self.event_callbacks.keys():
-                    for callback in self.event_callbacks[params['event']]:
+                    for callback_tuple in self.event_callbacks[params['event']]:
+                        func, args, kwargs = callback_tuple
                         try:
-                            callback(params['data'])
+                            func(params['data'], *args, **kwargs)
                         except Exception:
                             self.logger.exception("Callback raised unhandled")
                 else:
