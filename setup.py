@@ -1,25 +1,26 @@
 from setuptools import setup
 
-VERSION = "0.3.0"
+VERSION = "0.1.0"
 
 requirements = ["websocket-client"]
+
 
 def readme():
     with open('README.md') as f:
         return f.read()
 
 setup(
-    name="pusherclient",
+    name="Pysher",
     version=VERSION,
-    description="Pusher websocket client for python",
+    description="Pusher websocket client for python, based on Erik Kulyk's PythonPusherClient",
     long_description=readme(),
     keywords="pusher websocket client",
     author="Erik Kulyk",
-    author_email="e.kulyk@gmail.com",
+    author_email="23okrs20+github@mykolab.com",
     license="MIT",
-    url="https://github.com/ekulyk/PythonPusherClient",
+    url="https://github.com/nlsdfnbch/Pysher",
     install_requires=requirements,
-    packages=["pusherclient"],
+    packages=["pysher"],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',

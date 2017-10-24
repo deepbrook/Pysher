@@ -1,9 +1,7 @@
-[![Build Status](https://travis-ci.org/ekulyk/PythonPusherClient.svg?branch=master)](https://travis-ci.org/ekulyk/PythonPusherClient)
-
-pusherclient
+Pysher
 =============
 
-pusherclient is a python module for handling pusher websockets
+`pysher` is a python module for handling pusher websockets
 
 Installation
 ------------
@@ -17,7 +15,7 @@ Example
 
 Example of using this pusher client to consume websockets::
 
-    import pusherclient
+    import pysher
 
     # Add a logging handler so we can see the raw communication data
     import logging
@@ -26,7 +24,11 @@ Example of using this pusher client to consume websockets::
     ch = logging.StreamHandler(sys.stdout)
     root.addHandler(ch)
 
-    global pusher
+
+
+
+
+    pusher = pysher.Pusher(appkey)
 
     # We can't subscribe until we've connected, so we use a callback handler
     # to subscribe when able
@@ -34,7 +36,6 @@ Example of using this pusher client to consume websockets::
         channel = pusher.subscribe('mychannel')
         channel.bind('myevent', callback)
 
-    pusher = pusherclient.Pusher(appkey)
     pusher.connection.bind('pusher:connection_established', connect_handler)
     pusher.connect()
 
@@ -48,7 +49,7 @@ Sending pusher events to a channel can be done simply using the pusher client su
     pusher.app_id = app_id
     pusher.key = appkey
 
-    p = pusher.Pusher()
+    p = pysher.Pusher()
     p['mychannel'].trigger('myevent', 'mydata')
 
 Thanks

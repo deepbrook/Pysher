@@ -2,11 +2,7 @@ from threading import Thread, Timer
 import websocket
 import logging
 import time
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
+import json
 
 
 class Connection(Thread):

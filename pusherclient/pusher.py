@@ -1,12 +1,9 @@
-from pusherclient.channel import Channel
-from pusherclient.connection import Connection
+from pysher.channel import Channel
+from pysher.connection import Connection
 import hashlib
 import hmac
 import logging
 import json
-
-
-VERSION = "0.2.0"
 
 
 class Pusher(object):
