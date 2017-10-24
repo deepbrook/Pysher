@@ -1,10 +1,12 @@
+from collections import defaultdict
+
 class Channel(object):
     def __init__(self, channel_name, connection):
         self.name = channel_name
 
         self.connection = connection
 
-        self.event_callbacks = {}
+        self.event_callbacks = defaultdict(list)
 
     def bind(self, event_name, callback):
         """Bind an event to a callback
@@ -14,9 +16,6 @@ class Channel(object):
 
         :param callback: The callback to notify of this event.
         """
-        if event_name not in self.event_callbacks.keys():
-            self.event_callbacks[event_name] = []
-
         self.event_callbacks[event_name].append(callback)
 
     def trigger(self, event_name, data):
