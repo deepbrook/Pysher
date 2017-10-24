@@ -5,6 +5,7 @@ import hmac
 import logging
 import json
 
+VERSION = '0.2.0'
 
 class Pusher(object):
     host = "ws.pusherapp.com"
