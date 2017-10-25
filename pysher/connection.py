@@ -1,4 +1,5 @@
 from threading import Thread, Timer
+from collections import defaultdict
 import websocket
 import logging
 import time
@@ -14,7 +15,7 @@ class Connection(Thread):
         self.socket = None
         self.socket_id = ""
 
-        self.event_callbacks = {}
+        self.event_callbacks = defaultdict(list)
 
         self.disconnect_called = False
         self.needs_reconnect = False
@@ -64,10 +65,6 @@ class Connection(Thread):
 
         :param callback: The callback to notify of this event.
         """
-
-        if event_name not in self.event_callbacks.keys():
-            self.event_callbacks[event_name] = []
-
         self.event_callbacks[event_name].append((callback, args, kwargs))
 
     def disconnect(self):
