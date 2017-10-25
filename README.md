@@ -7,7 +7,7 @@ Pysher
 Installation
 ------------
 
-Simply run "python setup.py install".
+Simply run `python setup.py install` - or install via pip `pip install pysher`.
 
 This module depends on websocket-client module available from: <http://github.com/liris/websocket-client>
 
