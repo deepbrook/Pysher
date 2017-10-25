@@ -137,8 +137,7 @@ class Connection(Thread):
             if 'channel' not in params.keys():
                 # We've got a connection event.  Lets handle it.
                 if params['event'] in self.event_callbacks.keys():
-                    for callback_tuple in self.event_callbacks[params['event']]:
-                        func, args, kwargs = callback_tuple
+                    for func, args, kwargs in self.event_callbacks[params['event']]:
                         try:
                             func(params['data'], *args, **kwargs)
                         except Exception:
