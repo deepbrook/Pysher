@@ -17,7 +17,7 @@ class Channel(object):
 
         :param callback: The callback to notify of this event.
         """
-        self.event_callbacks[event_name].append((callback, *args, **kwargs))
+        self.event_callbacks[event_name].append((callback, args, kwargs))
 
     def trigger(self, event_name, data):
         """Trigger an event on this channel.  Only available for private or 
