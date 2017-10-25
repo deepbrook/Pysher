@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 
 requirements = ["websocket-client"]
 
@@ -26,12 +26,9 @@ setup(
         'Environment :: Web Environment',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Internet',
         'Topic :: Software Development :: Libraries ',
         'Topic :: Software Development :: Libraries :: Python Modules',
