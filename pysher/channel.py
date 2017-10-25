@@ -9,7 +9,7 @@ class Channel(object):
 
         self.event_callbacks = defaultdict(list)
 
-    def bind(self, event_name, callback):
+    def bind(self, event_name, callback, *args, **kwargs):
         """Bind an event to a callback
 
         :param event_name: The name of the event to bind to.
@@ -17,7 +17,7 @@ class Channel(object):
 
         :param callback: The callback to notify of this event.
         """
-        self.event_callbacks[event_name].append(callback)
+        self.event_callbacks[event_name].append((callback, args, kwargs))
 
     def trigger(self, event_name, data):
         """Trigger an event on this channel.  Only available for private or 
@@ -35,5 +35,5 @@ class Channel(object):
 
     def _handle_event(self, event_name, data):
         if event_name in self.event_callbacks.keys():
-            for callback in self.event_callbacks[event_name]:
-                callback(data)
+            for callback, args, kwargs in self.event_callbacks[event_name]:
+                callback(data, *args, **kwargs)
