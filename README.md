@@ -2,7 +2,8 @@
 Pysher
 =============
 
-`pysher` is a python module for handling pusher websockets
+`pysher` is a python module for handling pusher websockets. It is based on @ekulyk's `PythonPusherClient`. This fork is meant as 
+a continuation of the project and is actively maintained. A key difference is the dropped support for pre-3.5 Python versions.
 
 Installation
 ------------
