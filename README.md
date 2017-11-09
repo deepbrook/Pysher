@@ -41,7 +41,7 @@ Example of using this pusher client to consume websockets::
         # Do other things in the meantime here...
         time.sleep(1)
 
-Sending pusher events to a channel can be done simply using the pusher client supplied by pusher.  You can get it here: <http://github.com/newbamboo/pusher_client_python>
+Sending pusher events to a channel can be done simply using the pusher client supplied by pusher.  You can get it here: <https://github.com/pusher/pusher-http-python>
 
     import pusher
     pusher.app_id = app_id
