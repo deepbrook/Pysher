@@ -41,6 +41,9 @@ class Pusher(object):
         :param channel_name: The name of the channel to subscribe to.
         :type channel_name: str
 
+        :param auth: The token to use if authenticated externally.
+        :type auth: str
+
         :rtype : Channel
         """
         data = {'channel': channel_name}
