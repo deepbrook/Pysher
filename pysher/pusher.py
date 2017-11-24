@@ -35,32 +35,37 @@ class Pusher(object):
         self.connection.disconnect()
         self.channels = {}
 
-    def subscribe(self, channel_name):
+    def subscribe(self, channel_name, auth=None):
         """Subscribe to a channel
 
         :param channel_name: The name of the channel to subscribe to.
         :type channel_name: str
 
+        :param auth: The token to use if authenticated externally.
+        :type auth: str
+
         :rtype : Channel
         """
         data = {'channel': channel_name}
-
-        if channel_name.startswith('presence-'):
-            data['auth'] = self._generate_presence_key(
-                self.connection.socket_id,
-                self.key,
-                channel_name,
-                self.secret,
-                self.user_data
-            )
-            data['channel_data'] = json.dumps(self.user_data)
-        elif channel_name.startswith('private-'):
-            data['auth'] = self._generate_private_key(
-                self.connection.socket_id,
-                self.key,
-                channel_name,
-                self.secret
-            )
+        if auth is None:
+            if channel_name.startswith('presence-'):
+                data['auth'] = self._generate_presence_key(
+                    self.connection.socket_id,
+                    self.key,
+                    channel_name,
+                    self.secret,
+                    self.user_data
+                )
+                data['channel_data'] = json.dumps(self.user_data)
+            elif channel_name.startswith('private-'):
+                data['auth'] = self._generate_private_key(
+                    self.connection.socket_id,
+                    self.key,
+                    channel_name,
+                    self.secret
+                )
+        else:
+            data['auth'] = auth
 
         self.connection.send_event('pusher:subscribe', data)
 
