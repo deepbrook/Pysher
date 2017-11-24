@@ -13,14 +13,13 @@ class Pusher(object):
     protocol = 6
 
     def __init__(self, key, secure=True, secret=None, user_data=None, log_level=logging.INFO,
-                 daemon=True, port=None, reconnect_interval=10, **thread_kwargs):
+                 daemon=True, port=None, reconnect_interval=10, custom_host=None, **thread_kwargs):
         self.key = key
         self.secret = secret
         self.user_data = user_data or {}
 
         self.channels = {}
-
-        self.url = self._build_url(key, secure, port)
+        self.url = self._build_url(key, secure, port, custom_host)
 
         self.connection = Connection(self._connection_handler, self.url, log_level=log_level,
                                      daemon=daemon, reconnect_interval=reconnect_interval,
@@ -35,7 +34,7 @@ class Pusher(object):
         self.connection.disconnect()
         self.channels = {}
 
-    def subscribe(self, channel_name):
+    def subscribe(self, channel_name, auth=None):
         """Subscribe to a channel
 
         :param channel_name: The name of the channel to subscribe to.
@@ -119,7 +118,7 @@ class Pusher(object):
         return auth_key
 
     @classmethod
-    def _build_url(cls, key, secure, port=None):
+    def _build_url(cls, key, secure, port=None, custom_host=None):
         path = "/app/%s?client=%s&version=%s&protocol=%s" % (
             key,
             cls.client_id,
@@ -128,6 +127,11 @@ class Pusher(object):
         )
 
         proto = "ws"
+
+        if custom_host is None:
+            host = cls.host
+        else:
+            host = custom_host
 
         if secure:
             proto = "wss"
@@ -140,7 +144,7 @@ class Pusher(object):
 
         return "%s://%s:%s%s" % (
             proto,
-            cls.host,
+            host,
             port,
             path
         )
