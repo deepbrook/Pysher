@@ -34,7 +34,7 @@ class Pusher(object):
         self.connection.disconnect()
         self.channels = {}
 
-    def subscribe(self, channel_name, auth=None):
+    def subscribe(self, channel_name):
         """Subscribe to a channel
 
         :param channel_name: The name of the channel to subscribe to.
