@@ -5,7 +5,7 @@ sys.path.append('..')
 
 import time
 
-import pusherclient
+import pysher
 
 # Add a logging handler so we can see the raw communication data
 import logging
