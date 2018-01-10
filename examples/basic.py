@@ -5,7 +5,7 @@ sys.path.append('..')
 
 import time
 
-import pusherclient
+import pysher
 
 # Add a logging handler so we can see the raw communication data
 import logging
@@ -26,7 +26,7 @@ def connect_handler(data):
     channel = pusher.subscribe("test_channel")
 
     channel.bind('my_event', channel_callback)
-    
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     appkey = sys.argv[1]
 
-    pusher = pusherclient.Pusher(appkey)
+    pusher = pysher.Pusher(appkey)
 
     pusher.connection.bind('pusher:connection_established', connect_handler)
     pusher.connect()

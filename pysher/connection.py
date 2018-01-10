@@ -67,12 +67,12 @@ class Connection(Thread):
         """
         self.event_callbacks[event_name].append((callback, args, kwargs))
 
-    def disconnect(self):
+    def disconnect(self, timeout=None):
         self.needs_reconnect = False
         self.disconnect_called = True
         if self.socket:
             self.socket.close()
-        self.join()
+        self.join(timeout)
 
     def reconnect(self, reconnect_interval=None):
         if reconnect_interval is None:
