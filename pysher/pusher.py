@@ -29,9 +29,9 @@ class Pusher(object):
         """Connect to Pusher"""
         self.connection.start()
 
-    def disconnect(self):
+    def disconnect(self, timeout=None):
         """Disconnect from Pusher"""
-        self.connection.disconnect()
+        self.connection.disconnect(timeout)
         self.channels = {}
 
     def subscribe(self, channel_name, auth=None):
