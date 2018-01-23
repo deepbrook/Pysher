@@ -7,10 +7,12 @@ import json
 
 
 class Connection(Thread):
-    def __init__(self, event_handler, url, log_level=logging.INFO, daemon=True,
-                 reconnect_interval=10, **thread_kwargs):
+    def __init__(self, event_handler, url, reconnect_handler=None, log_level=logging.INFO,
+                 daemon=True, reconnect_interval=10, **thread_kwargs):
         self.event_handler = event_handler
         self.url = url
+
+        self.reconnect_handler = reconnect_handler or (lambda: None)
 
         self.socket = None
         self.socket_id = ""
@@ -225,6 +227,11 @@ class Connection(Thread):
         parsed = json.loads(data)
         self.socket_id = parsed['socket_id']
         self.state = "connected"
+
+        if self.needs_reconnect:
+            self.reconnect_handler()
+        else:
+            self.logger.debug('Connection: Establisheds first connection')
 
     def _failed_handler(self, data):
         self.state = "failed"
