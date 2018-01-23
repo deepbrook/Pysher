@@ -2,12 +2,14 @@ from collections import defaultdict
 
 
 class Channel(object):
-    def __init__(self, channel_name, connection):
+    def __init__(self, channel_name, connection, auth=None):
         self.name = channel_name
 
         self.connection = connection
 
         self.event_callbacks = defaultdict(list)
+
+        self.auth = auth
 
     def bind(self, event_name, callback, *args, **kwargs):
         """Bind an event to a callback
@@ -20,7 +22,7 @@ class Channel(object):
         self.event_callbacks[event_name].append((callback, args, kwargs))
 
     def trigger(self, event_name, data):
-        """Trigger an event on this channel.  Only available for private or 
+        """Trigger an event on this channel.  Only available for private or
         presence channels
 
         :param event_name: The name of the event.  Must begin with 'client-''
