@@ -14,6 +14,7 @@ class Pusher(object):
 
     def __init__(self, key, secure=True, secret=None, user_data=None, log_level=logging.INFO,
                  daemon=True, port=None, reconnect_interval=10, custom_host=None, auto_sub=False,
+                 http_proxy_host=None, http_proxy_port=None, http_no_proxy=None, http_proxy_auth=None,
                  **thread_kwargs):
         self.key = key
         self.secret = secret
@@ -32,6 +33,10 @@ class Pusher(object):
                                      log_level=log_level,
                                      daemon=daemon,
                                      reconnect_interval=reconnect_interval,
+                                     socket_kwargs=dict(http_proxy_host=http_proxy_host,
+                                                        http_proxy_port=http_proxy_port,
+                                                        http_no_proxy=http_no_proxy,
+                                                        http_proxy_auth=http_proxy_auth),
                                      **thread_kwargs)
 
     def connect(self):

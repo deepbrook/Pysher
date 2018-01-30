@@ -8,7 +8,7 @@ import json
 
 class Connection(Thread):
     def __init__(self, event_handler, url, reconnect_handler=None, log_level=logging.INFO,
-                 daemon=True, reconnect_interval=10, **thread_kwargs):
+                 daemon=True, reconnect_interval=10, socket_kwargs=None, **thread_kwargs):
         self.event_handler = event_handler
         self.url = url
 
@@ -23,6 +23,7 @@ class Connection(Thread):
         self.needs_reconnect = False
         self.default_reconnect_interval = reconnect_interval
         self.reconnect_interval = reconnect_interval
+        self.socket_kwargs = socket_kwargs or dict()
 
         self.pong_timer = None
         self.pong_received = False
@@ -101,7 +102,7 @@ class Connection(Thread):
             on_close=self._on_close
         )
 
-        self.socket.run_forever()
+        self.socket.run_forever(**self.socket_kwargs)
 
         while self.needs_reconnect and not self.disconnect_called:
             self.logger.info("Attempting to connect again in %s seconds."
@@ -112,7 +113,7 @@ class Connection(Thread):
             # We need to set this flag since closing the socket will set it to
             # false
             self.socket.keep_running = True
-            self.socket.run_forever()
+            self.socket.run_forever(**self.socket_kwargs)
 
     def _on_open(self, ws):
         self.logger.info("Connection: Connection opened")
