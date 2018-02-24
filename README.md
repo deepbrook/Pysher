@@ -18,29 +18,35 @@ Example
 
 Example of using this pusher client to consume websockets::
 
-    import pysher
+```python
+import pysher
 
-    # Add a logging handler so we can see the raw communication data
-    import logging
-    root = logging.getLogger()
-    root.setLevel(logging.INFO)
-    ch = logging.StreamHandler(sys.stdout)
-    root.addHandler(ch)
+# Add a logging handler so we can see the raw communication data
+import logging
+root = logging.getLogger()
+root.setLevel(logging.INFO)
+ch = logging.StreamHandler(sys.stdout)
+root.addHandler(ch)
 
-    pusher = pysher.Pusher(appkey)
+pusher = pysher.Pusher(appkey)
 
-    # We can't subscribe until we've connected, so we use a callback handler
-    # to subscribe when able
-    def connect_handler(data):
-        channel = pusher.subscribe('mychannel')
-        channel.bind('myevent', callback)
+def  my_func(*args, **kwargs):
+    print("processing Args:", args)
+    print("processing Kwargs:", kwargs)
 
-    pusher.connection.bind('pusher:connection_established', connect_handler)
-    pusher.connect()
+# We can't subscribe until we've connected, so we use a callback handler
+# to subscribe when able
+def connect_handler(data):
+    channel = pusher.subscribe('mychannel')
+    channel.bind('myevent', my_func)
 
-    while True:
-        # Do other things in the meantime here...
-        time.sleep(1)
+pusher.connection.bind('pusher:connection_established', connect_handler)
+pusher.connect()
+
+while True:
+    # Do other things in the meantime here...
+    time.sleep(1)
+```
 
 Sending pusher events to a channel can be done simply using the pusher client supplied by pusher.  You can get it here: <https://github.com/pusher/pusher-http-python>
 
