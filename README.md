@@ -70,6 +70,10 @@ MTI License - See LICENSE for details.
 Changelog
 ---------
 
+## Version 0.4.2
+### Fixed:
+ - #11 Global Logger settings no longer overridden in Connection logger
+
 ## Version 0.4.0
 ### Added:
  - #8 Add support for WebSocket over HTTP proxy, thanks to @[1tgr](https://github.com/1tgr)

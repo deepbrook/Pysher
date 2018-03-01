@@ -7,7 +7,7 @@ import json
 
 
 class Connection(Thread):
-    def __init__(self, event_handler, url, reconnect_handler=None, log_level=logging.INFO,
+    def __init__(self, event_handler, url, reconnect_handler=None, log_level=None,
                  daemon=True, reconnect_interval=10, socket_kwargs=None, **thread_kwargs):
         self.event_handler = event_handler
         self.url = url
@@ -38,9 +38,11 @@ class Connection(Thread):
         self.state = "initialized"
 
         self.logger = logging.getLogger(self.__module__)  # create a new logger
-        if log_level == logging.DEBUG:
-            websocket.enableTrace(True)
-        self.logger.setLevel(log_level)
+
+        if log_level:
+            self.logger.setLevel(log_level)
+            if log_level == logging.DEBUG:
+                websocket.enableTrace(True)
 
         # From Martyn's comment at:
         # https://pusher.tenderapp.com/discussions/problems/36-no-messages-received-after-1-idle-minute-heartbeat
