@@ -12,16 +12,21 @@ class Pusher(object):
     client_id = 'PythonPusherClient'
     protocol = 6
 
-    def __init__(self, key, secure=True, secret=None, user_data=None, log_level=logging.INFO,
+    def __init__(self, key, cluster=None, secure=True, secret=None, user_data=None, log_level=logging.INFO,
                  daemon=True, port=None, reconnect_interval=10, custom_host=None, auto_sub=False,
                  http_proxy_host=None, http_proxy_port=None, http_no_proxy=None, http_proxy_auth=None,
                  **thread_kwargs):
+        # https://pusher.com/docs/clusters
+        if cluster:
+            self.host = "ws-" + cluster + ".pusher.com"
+        else:
+            self.host = "ws.pusherapp.com"
         self.key = key
         self.secret = secret
         self.user_data = user_data or {}
 
         self.channels = {}
-        self.url = self._build_url(key, secure, port, custom_host)
+        self.url = self._build_url(key, secure, cluster, port, custom_host)
 
         if auto_sub:
             reconnect_handler = self._reconnect_handler
@@ -146,7 +151,7 @@ class Pusher(object):
         return auth_key
 
     @classmethod
-    def _build_url(cls, key, secure, port=None, custom_host=None):
+    def _build_url(cls, key, secure, cluster, port=None, custom_host=None):
         path = "/app/%s?client=%s&version=%s&protocol=%s" % (
             key,
             cls.client_id,
@@ -156,7 +161,9 @@ class Pusher(object):
 
         proto = "ws"
 
-        if custom_host is None:
+        if cluster:
+            host = "ws-" + cluster + ".pusher.com"
+        elif not custom_host:
             host = cls.host
         else:
             host = custom_host
