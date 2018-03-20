@@ -18,7 +18,7 @@ class Pusher(object):
                  **thread_kwargs):
         # https://pusher.com/docs/clusters
         if cluster:
-            self.host = "ws-" + cluster + ".pusher.com"
+            self.host = f"ws-{cluster}.pusher.com"
         else:
             self.host = "ws.pusherapp.com"
         self.key = key
@@ -162,7 +162,7 @@ class Pusher(object):
         proto = "ws"
 
         if cluster:
-            host = "ws-" + cluster + ".pusher.com"
+            host = f"ws-{cluster}.pusher.com"
         elif not custom_host:
             host = cls.host
         else:
