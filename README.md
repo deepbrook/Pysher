@@ -70,6 +70,10 @@ MTI License - See LICENSE for details.
 Changelog
 ---------
 
+## Version 0.5.0
+### Added
+ - #14 Added support for cluster configuration, thanks t o @[Yvictor](https://github.com/Yvictor)
+
 ## Version 0.4.2
 ### Fixed:
  - #11 Global Logger settings no longer overridden in Connection logger
