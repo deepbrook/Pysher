@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import logging
 import json
-from IPython import embed
+
 VERSION = '0.2.0'
 
 class Pusher(object):
@@ -145,7 +145,7 @@ class Pusher(object):
 
         if socket_id and key and channel_name and secret and user_data:
             subject = "%s:%s:%s" % (socket_id, channel_name, json.dumps(user_data))
-            h = hmac.new(secret, subject, hashlib.sha256)
+            h = hmac.new(secret.encode('utf-8'), subject.encode('utf-8'), hashlib.sha256)
             auth_key = "%s:%s" % (key, h.hexdigest())
 
         return auth_key
