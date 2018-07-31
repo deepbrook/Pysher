@@ -1,4 +1,5 @@
-from threading import Thread, Timer
+import sched
+from threading import Thread
 from collections import defaultdict
 import websocket
 import logging
@@ -58,6 +59,9 @@ class Connection(Thread):
 
         self.ping_interval = 120
         self.ping_timer = None
+
+        self.scheduler = sched.scheduler(time.time, sleep_max_n(30))
+        self.scheduler_thread = None
 
         Thread.__init__(self, **thread_kwargs)
         self.daemon = daemon
@@ -171,23 +175,28 @@ class Connection(Thread):
         return json.loads(message)
 
     def _stop_timers(self):
-        if self.ping_timer:
-            self.ping_timer.cancel()
-
-        if self.connection_timer:
-            self.connection_timer.cancel()
-
-        if self.pong_timer:
-            self.pong_timer.cancel()
+        for event in self.scheduler.queue:
+            self._cancel_scheduler_event(event)
 
     def _start_timers(self):
         self._stop_timers()
 
-        self.ping_timer = Timer(self.ping_interval, self.send_ping)
-        self.ping_timer.start()
+        self.ping_timer = self.scheduler.enter(self.ping_interval, 1, self.send_ping)
+        self.connection_timer = self.scheduler.enter(self.connection_timeout, 1, self._connection_timed_out)
 
-        self.connection_timer = Timer(self.connection_timeout, self._connection_timed_out)
-        self.connection_timer.start()
+        if not self.scheduler_thread:
+            self.scheduler_thread = Thread(target=self.scheduler.run, daemon=True)
+            self.scheduler_thread.start()
+
+        elif not self.scheduler_thread.is_alive():
+            self.scheduler_thread = Thread(target=self.scheduler.run, daemon=True)
+            self.scheduler_thread.start()
+
+    def _cancel_scheduler_event(self, event):
+        try:
+            self.scheduler.cancel(event)
+        except ValueError:
+            self.logger.info('Connection: Scheduling event already cancelled')
 
     def send_event(self, event_name, data, channel_name=None):
         event = {'event': event_name, 'data': data}
@@ -206,8 +215,8 @@ class Connection(Thread):
             self.socket.send(json.dumps({'event': 'pusher:ping', 'data': ''}))
         except Exception as e:
             self.logger.error("Failed send ping: %s" % e)
-        self.pong_timer = Timer(self.pong_timeout, self._check_pong)
-        self.pong_timer.start()
+
+        self.pong_timer = self.scheduler.enter(self.pong_timeout, 1, self._check_pong)
 
     def send_pong(self):
         self.logger.info("Connection: pong to pusher")
@@ -217,7 +226,7 @@ class Connection(Thread):
             self.logger.error("Failed send pong: %s" % e)
 
     def _check_pong(self):
-        self.pong_timer.cancel()
+        self._cancel_scheduler_event(self.pong_timer)
 
         if self.pong_received:
             self.pong_received = False
@@ -281,3 +290,9 @@ class Connection(Thread):
         self.logger.info("Did not receive any data in time.  Reconnecting.")
         self.state = "failed"
         self.reconnect()
+
+
+def sleep_max_n(max_sleep_time):
+    def sleep(time_to_sleep):
+        time.sleep(min(max_sleep_time, time_to_sleep))
+    return sleep
