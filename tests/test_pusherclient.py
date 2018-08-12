@@ -76,7 +76,7 @@ if __name__ == '__main__':
     pysher.Pusher.host = "127.0.0.1"
     client = pysher.Pusher(appkey, port=PORT, secure=False, reconnect_interval=1)
 
-    print(client._build_url("mykey", False, None, port=PORT))
+    print(client._build_url(secure=False, port=PORT))
     client.connection.bind('pusher:connection_established', connect_handler)
     client.connect()
 
