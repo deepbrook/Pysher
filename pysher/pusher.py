@@ -5,28 +5,50 @@ import hmac
 import logging
 import json
 
-VERSION = '0.2.0'
+VERSION = '0.6.0'
+
 
 class Pusher(object):
     host = "ws.pusherapp.com"
-    client_id = 'PythonPusherClient'
+    client_id = "PythonPusherClient"
     protocol = 6
 
-    def __init__(self, key, cluster=None, secure=True, secret=None, user_data=None, log_level=logging.INFO,
-                 daemon=True, port=None, reconnect_interval=10, custom_host=None, auto_sub=False,
-                 http_proxy_host=None, http_proxy_port=None, http_no_proxy=None, http_proxy_auth=None,
+    def __init__(self, key, cluster="", secure=True, secret="", user_data=None, log_level=logging.INFO,
+                 daemon=True, port=443, reconnect_interval=10, custom_host="", auto_sub=False,
+                 http_proxy_host="", http_proxy_port=0, http_no_proxy=None, http_proxy_auth=None,
                  **thread_kwargs):
+        """Initialize the Pusher instance.
+
+        :param str or bytes key:
+        :param str cluster:
+        :param bool secure:
+        :param bytes or str secret:
+        :param Optional[Dict] user_data:
+        :param str log_level:
+        :param bool daemon:
+        :param int port:
+        :param int or float reconnect_interval:
+        :param str custom_host:
+        :param bool auto_sub:
+        :param stt http_proxy_host:
+        :param int http_proxy_port:
+        :param http_no_proxy:
+        :param http_proxy_auth:
+        :param Any thread_kwargs:
+        """
         # https://pusher.com/docs/clusters
         if cluster:
             self.host = "ws-{cluster}.pusher.com".format(cluster=cluster)
         else:
             self.host = "ws.pusherapp.com"
+
         self.key = key
         self.secret = secret
+
         self.user_data = user_data or {}
 
         self.channels = {}
-        self.url = self._build_url(key, secure, cluster, port, custom_host)
+        self.url = self._build_url(secure, port, custom_host)
 
         if auto_sub:
             reconnect_handler = self._reconnect_handler
@@ -44,6 +66,14 @@ class Pusher(object):
                                                         http_proxy_auth=http_proxy_auth),
                                      **thread_kwargs)
 
+    @property
+    def key_as_bytes(self):
+        return self.key if isinstance(self.key, bytes) else self.key.encode('UTF-8')
+
+    @property
+    def secret_as_bytes(self):
+        return self.secret if isinstance(self.secret, bytes) else self.secret.encode('UTF-8')
+
     def connect(self):
         """Connect to Pusher"""
         self.connection.start()
@@ -54,34 +84,19 @@ class Pusher(object):
         self.channels = {}
 
     def subscribe(self, channel_name, auth=None):
-        """Subscribe to a channel
+        """Subscribe to a channel.
 
-        :param channel_name: The name of the channel to subscribe to.
-        :type channel_name: str
-
-        :param auth: The token to use if authenticated externally.
-        :type auth: str
-
-        :rtype : Channel
+        :param str channel_name: The name of the channel to subscribe to.
+        :param str auth: The token to use if authenticated externally.
+        :rtype: pysher.Channel
         """
         data = {'channel': channel_name}
         if auth is None:
             if channel_name.startswith('presence-'):
-                data['auth'] = self._generate_presence_key(
-                    self.connection.socket_id,
-                    self.key,
-                    channel_name,
-                    self.secret,
-                    self.user_data
-                )
+                data['auth'] = self._generate_presence_token(channel_name)
                 data['channel_data'] = json.dumps(self.user_data)
             elif channel_name.startswith('private-'):
-                data['auth'] = self._generate_private_key(
-                    self.connection.socket_id,
-                    self.key,
-                    channel_name,
-                    self.secret
-                )
+                data['auth'] = self._generate_auth_token(channel_name)
         else:
             data['auth'] = auth
 
@@ -94,8 +109,7 @@ class Pusher(object):
     def unsubscribe(self, channel_name):
         """Unsubscribe from a channel
 
-        :param channel_name: The name of the channel to unsubscribe from.
-        :type channel_name: str
+        :param str channel_name: The name of the channel to unsubscribe from.
         """
         if channel_name in self.channels:
             self.connection.send_event(
@@ -108,18 +122,23 @@ class Pusher(object):
     def channel(self, channel_name):
         """Get an existing channel object by name
 
-        :param channel_name: The name of the channel you want to retrieve
-        :type channel_name: str
-
-        :rtype: Channel or None
+        :param str channel_name: The name of the channel you want to retrieve
+        :rtype: pysher.Channel or None
         """
         return self.channels.get(channel_name)
 
     def _connection_handler(self, event_name, data, channel_name):
+        """Handle incoming data.
+
+        :param str event_name: Name of the event.
+        :param Any data: Data received.
+        :param str channel_name: Name of the channel this event and data belongs to.
+        """
         if channel_name in self.channels:
             self.channels[channel_name]._handle_event(event_name, data)
 
     def _reconnect_handler(self):
+        """Handle a reconnect."""
         for channel_name, channel in self.channels.items():
             data = {'channel': channel_name}
 
@@ -128,58 +147,39 @@ class Pusher(object):
 
             self.connection.send_event('pusher:subscribe', data)
 
-    @staticmethod
-    def _generate_private_key(socket_id, key, channel_name, secret):
-        auth_key = ""
+    def _generate_auth_token(self, channel_name):
+        """Generate a token for authentication with the given channel.
 
-        if socket_id and key and channel_name and secret:
-            subject = "%s:%s" % (socket_id, channel_name)
-            h = hmac.new(secret, subject, hashlib.sha256)
-            auth_key = "%s:%s" % (key, h.hexdigest())
-
-        return auth_key
-
-    @staticmethod
-    def _generate_presence_key(socket_id, key, channel_name, secret, user_data):
-        auth_key = ""
-
-        if socket_id and key and channel_name and secret and user_data:
-            subject = "%s:%s:%s" % (socket_id, channel_name, json.dumps(user_data))
-            h = hmac.new(secret, subject, hashlib.sha256)
-            auth_key = "%s:%s" % (key, h.hexdigest())
+        :param str channel_name: Name of the channel to generate a signature for.
+        :rtype: str
+        """
+        subject = "{}:{}".format(self.connection.socket_id, channel_name)
+        h = hmac.new(self.secret_as_bytes, subject, hashlib.sha256)
+        auth_key = "{}:{}".format(self.key, h.hexdigest())
 
         return auth_key
 
-    @classmethod
-    def _build_url(cls, key, secure, cluster, port=None, custom_host=None):
-        path = "/app/%s?client=%s&version=%s&protocol=%s" % (
-            key,
-            cls.client_id,
-            VERSION,
-            cls.protocol
+    def _generate_presence_token(self, channel_name):
+        """Generate a presence token.
+
+        :param str channel_name: Name of the channel to generate a signature for.
+        :rtype: str
+        """
+        subject = "{}:{}:{}".format(self.connection.socket_id, channel_name, json.dumps(self.user_data))
+        h = hmac.new(self.secret_as_bytes, subject, hashlib.sha256)
+        auth_key = "{}:{}".format(self.key, h.hexdigest())
+
+        return auth_key
+
+    def _build_url(self, secure, port=None, custom_host=None):
+        path = "/app/{}?client={}&version={}&protocol={}".format(
+            self.key, self.client_id, VERSION, self.protocol
         )
 
-        proto = "ws"
+        proto = "wss" if secure else "ws"
 
-        if cluster:
-            host = "ws-{cluster}.pusher.com".format(cluster=cluster)
-        elif not custom_host:
-            host = cls.host
-        else:
-            host = custom_host
+        host = custom_host or self.host
+        if not port:
+            port = 443 if secure else 80
 
-        if secure:
-            proto = "wss"
-
-        if port is None:
-            if secure:
-                port = 443
-            else:
-                port = 80
-
-        return "%s://%s:%s%s" % (
-            proto,
-            host,
-            port,
-            path
-        )
+        return "{}://{}:{}{}".format(proto, host, port, path)
