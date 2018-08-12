@@ -10,7 +10,7 @@ VERSION = '0.6.0'
 
 class Pusher(object):
     host = "ws.pusherapp.com"
-    client_id = "PythonPusherClient"
+    client_id = "Pysher"
     protocol = 6
 
     def __init__(self, key, cluster="", secure=True, secret="", user_data=None, log_level=logging.INFO,

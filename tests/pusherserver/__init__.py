@@ -1,16 +1,9 @@
 import sys
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
+import json
 
-if sys.version > '3':
-    from .pusherserverasyncio import Pusher
-    from autobahn.asyncio.websocket import WebSocketServerProtocol
-else:
-    from pusherservertwisted import Pusher
-    from autobahn.twisted.websocket import WebSocketServerProtocol
+from .pusherserverasyncio import Pusher
+from autobahn.asyncio.websocket import WebSocketServerProtocol
 
 
 class PusherTestServerProtocol(WebSocketServerProtocol):

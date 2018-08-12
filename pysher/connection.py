@@ -60,8 +60,10 @@ class Connection(Thread):
         self.ping_interval = 120
         self.ping_timer = None
 
-
-        self.timeout_scheduler = sched.scheduler(time.time, sleep_max_n(min([self.pong_timeout, self.connection_timeout, self.ping_interval])))
+        self.timeout_scheduler = sched.scheduler(
+            time.time,
+            sleep_max_n(min([self.pong_timeout, self.connection_timeout, self.ping_interval]))
+        )
         self.timeout_scheduler_thread = None
 
         Thread.__init__(self, **thread_kwargs)
@@ -200,6 +202,12 @@ class Connection(Thread):
             self.logger.info('Connection: Scheduling event already cancelled')
 
     def send_event(self, event_name, data, channel_name=None):
+        """Send an event to the Pusher server.
+
+        :param str event_name:
+        :param Any data:
+        :param str channel_name:
+        """
         event = {'event': event_name, 'data': data}
         if channel_name:
             event['channel'] = channel_name
@@ -260,12 +268,11 @@ class Connection(Thread):
 
     def _pusher_error_handler(self, data):
         if 'code' in data:
-            error_code = None
 
             try:
                 error_code = int(data['code'])
             except:
-                pass
+                error_code = None
 
             if error_code is not None:
                 self.logger.error("Connection: Received error %s" % error_code)

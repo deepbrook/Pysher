@@ -1,8 +1,5 @@
 # Python >3.4
-try:
-    import asyncio
-except ImportError:
-    import trollius as asyncio
+import asyncio
 
 from autobahn.asyncio.websocket import WebSocketServerFactory
 
@@ -32,6 +29,6 @@ class Pusher():
             self.server.close()
             self.loop.close()
 
-    def stop(self, fromThread = None):
+    def stop(self, **kwargs):
         if self.loop and self.loop.is_running():
             self.loop.stop()
