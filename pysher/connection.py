@@ -124,6 +124,10 @@ class Connection(Thread):
 
     def _on_open(self, ws):
         self.logger.info("Connection: Connection opened")
+        
+        # Since we've opened a connection, we don't need to try to reconnect
+        self.needs_reconnect = False
+        
         # Send a ping right away to inform that the connection is alive. If you
         # don't do this, it takes the ping interval to subcribe to channel and
         # events
