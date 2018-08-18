@@ -74,6 +74,9 @@ Changelog
 ### Added
  - #14 Added support for cluster configuration, thanks t o @[Yvictor](https://github.com/Yvictor)
 
+### Fixed
+ - #30 Require websocket-client version 0.48 or earlier.
+
 ## Version 0.4.2
 ### Fixed:
  - #11 Global Logger settings no longer overridden in Connection logger
