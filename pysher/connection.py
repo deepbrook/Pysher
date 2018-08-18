@@ -68,7 +68,8 @@ class Connection(Thread):
 
         Thread.__init__(self, **thread_kwargs)
         self.daemon = daemon
-
+        self.name = "PysherEventLoop"
+    
     def bind(self, event_name, callback, *args, **kwargs):
         """Bind an event to a callback
 
@@ -192,13 +193,13 @@ class Connection(Thread):
         self.connection_timer = self.timeout_scheduler.enter(self.connection_timeout, 2, self._connection_timed_out)
 
         if not self.timeout_scheduler_thread:
-            self.timeout_scheduler_thread = Thread(target=self.timeout_scheduler.run, daemon=True)
+            self.timeout_scheduler_thread = Thread(target=self.timeout_scheduler.run, daemon=True, name="PysherScheduler")
             self.timeout_scheduler_thread.start()
 
         elif not self.timeout_scheduler_thread.is_alive():
-            self.timeout_scheduler_thread = Thread(target=self.timeout_scheduler.run, daemon=True)
-            self.timeout_scheduler_thread.start()
-
+           self.timeout_scheduler_thread = Thread(target=self.timeout_scheduler.run, daemon=True, name="PysherScheduler")
+           self.timeout_scheduler_thread.start()
+        
     def _cancel_scheduler_event(self, event):
         try:
             self.timeout_scheduler.cancel(event)
