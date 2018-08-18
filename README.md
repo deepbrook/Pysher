@@ -11,7 +11,7 @@ Installation
 
 Simply run `python setup.py install` - or install via pip `pip install pysher`.
 
-This module depends on websocket-client module available from: <http://github.com/liris/websocket-client>
+This module depends on websocket-client module available from: <http://github.com/websocket-client/websocket-client>
 
 Example
 -------
@@ -56,6 +56,10 @@ Sending pusher events to a channel can be done simply using the pusher client su
 
     p = pusher.Pusher()
     p['mychannel'].trigger('myevent', 'mydata')
+    
+Performance
+------
+Pysher relies on websocket-client (websocket-client on pyPI, websocket import in code), which by default does utf5 validation in pure python. This is somewhat cpu hungry for lot's of messages (100's of KB/s or more). To optimize this validation consider installing the wsaccel module from pyPI to let websocket-client use C-compiled utf5 validation methods (websocket does this automatically once wsaccel is present and importable).
 
 Thanks
 ------
