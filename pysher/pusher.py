@@ -154,6 +154,9 @@ class Pusher(object):
         :rtype: str
         """
         subject = "{}:{}".format(self.connection.socket_id, channel_name)
+        if not isinstance(subject, bytes):
+            subject = subject.encode('utf-8')
+
         h = hmac.new(self.secret_as_bytes, subject, hashlib.sha256)
         auth_key = "{}:{}".format(self.key, h.hexdigest())
 
@@ -166,6 +169,9 @@ class Pusher(object):
         :rtype: str
         """
         subject = "{}:{}:{}".format(self.connection.socket_id, channel_name, json.dumps(self.user_data))
+        if not isinstance(subject, bytes):
+            subject = subject.encode('utf-8')
+
         h = hmac.new(self.secret_as_bytes, subject, hashlib.sha256)
         auth_key = "{}:{}".format(self.key, h.hexdigest())
 
