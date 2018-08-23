@@ -63,7 +63,8 @@ class Pusher(object):
                                      socket_kwargs=dict(http_proxy_host=http_proxy_host,
                                                         http_proxy_port=http_proxy_port,
                                                         http_no_proxy=http_no_proxy,
-                                                        http_proxy_auth=http_proxy_auth),
+                                                        http_proxy_auth=http_proxy_auth,
+                                                        ping_timeout=100),
                                      **thread_kwargs)
 
     @property
