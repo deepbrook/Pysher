@@ -1,28 +1,24 @@
+from pathlib import Path
+
 from setuptools import setup
 
-VERSION = "0.6.0b2"
-
-requirements = ["websocket-client<=0.48"]
-
-
-def readme():
-    with open('README.md') as f:
-        return f.read()
 
 setup(
     name="Pysher",
-    version=VERSION,
+    version="0.6.0b2",
     description="Pusher websocket client for python, based on Erik Kulyk's PythonPusherClient",
-    long_description=readme(),
+    long_description=Path(__file__).parent.joinpath('README.md').read_text(),
+    long_description_content_type='text/markdown',
     keywords="pusher websocket client",
     author="Erik Kulyk",
     author_email="23okrs20+github@mykolab.com",
     license="MIT",
     url="https://github.com/nlsdfnbch/Pysher",
-    install_requires=requirements,
+    install_requires=["websocket-client<=0.48"],
+    python_requires='>= 3.5',
     packages=["pysher"],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
