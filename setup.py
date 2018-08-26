@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 requirements = ["websocket-client>0.48"]
 
