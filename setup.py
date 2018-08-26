@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = "0.6.0b2"
+VERSION = "1.0.0"
 
 requirements = ["websocket-client>0.48"]
 
@@ -22,7 +22,7 @@ setup(
     install_requires=requirements,
     packages=["pysher"],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',

@@ -73,6 +73,11 @@ MTI License - See LICENSE for details.
 
 Changelog
 ---------
+## 1.0.0
+### Updated
+- #35 Support websocket-client >0.48 only and fix reconnect error, thanks to @[agronholm](https://github.com/agronholm)
+
+**This change may break existing setups and is backwards-incompatible!**
 
 ## Version 0.5.0
 ### Added
