@@ -125,24 +125,21 @@ class Connection(Thread):
             self.socket.keep_running = True
             self.socket.run_forever(**self.socket_kwargs)
 
-    def _on_open(self, ws):
+    def _on_open(self):
         self.logger.info("Connection: Connection opened")
-        
-        # Since we've opened a connection, we don't need to try to reconnect
-        self.needs_reconnect = False
-        
+                
         # Send a ping right away to inform that the connection is alive. If you
         # don't do this, it takes the ping interval to subcribe to channel and
         # events
         self.send_ping()
         self._start_timers()
 
-    def _on_error(self, ws, error):
+    def _on_error(self, error):
         self.logger.info("Connection: Error - %s" % error)
         self.state = "failed"
         self.needs_reconnect = True
 
-    def _on_message(self, ws, message):
+    def _on_message(self, message):
         self.logger.info("Connection: Message - %s" % message)
 
         # Stop our timeout timer, since we got some data
@@ -173,7 +170,7 @@ class Connection(Thread):
         # We've handled our data, so restart our connection timeout handler
         self._start_timers()
 
-    def _on_close(self, ws, *args):
+    def _on_close(self, *args):
         self.logger.info("Connection: Connection closed")
         self.state = "disconnected"
         self._stop_timers()
@@ -255,7 +252,13 @@ class Connection(Thread):
         self.state = "connected"
 
         if self.needs_reconnect:
+
+            # Since we've opened a connection, we don't need to try to reconnect
+            self.needs_reconnect = False
+
             self.reconnect_handler()
+
+            self.logger.debug('Connection: Establisheds reconnection')
         else:
             self.logger.debug('Connection: Establisheds first connection')
 

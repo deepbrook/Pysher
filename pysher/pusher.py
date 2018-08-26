@@ -63,7 +63,8 @@ class Pusher(object):
                                      socket_kwargs=dict(http_proxy_host=http_proxy_host,
                                                         http_proxy_port=http_proxy_port,
                                                         http_no_proxy=http_no_proxy,
-                                                        http_proxy_auth=http_proxy_auth),
+                                                        http_proxy_auth=http_proxy_auth,
+                                                        ping_timeout=100),
                                      **thread_kwargs)
 
     @property
@@ -154,7 +155,7 @@ class Pusher(object):
         :rtype: str
         """
         subject = "{}:{}".format(self.connection.socket_id, channel_name)
-        h = hmac.new(self.secret_as_bytes, subject, hashlib.sha256)
+        h = hmac.new(self.secret_as_bytes, subject.encode('utf-8'), hashlib.sha256)
         auth_key = "{}:{}".format(self.key, h.hexdigest())
 
         return auth_key
@@ -166,7 +167,7 @@ class Pusher(object):
         :rtype: str
         """
         subject = "{}:{}:{}".format(self.connection.socket_id, channel_name, json.dumps(self.user_data))
-        h = hmac.new(self.secret_as_bytes, subject, hashlib.sha256)
+        h = hmac.new(self.secret_as_bytes, subject.encode('utf-8'), hashlib.sha256)
         auth_key = "{}:{}".format(self.key, h.hexdigest())
 
         return auth_key
