@@ -14,6 +14,7 @@ setup(
     version=VERSION,
     description="Pusher websocket client for python, based on Erik Kulyk's PythonPusherClient",
     long_description=readme(),
+    long_description_content_type='text/markdown',
     keywords="pusher websocket client",
     author="Erik Kulyk",
     author_email="23okrs20+github@mykolab.com",
