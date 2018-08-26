@@ -80,6 +80,8 @@ Changelog
 
 ### Fixed
  - #30 Require websocket-client version 0.48 or earlier.
+ - #24 Signature generation now works as expected, thanks to @[agronholm](https://github.com/agronholm)
+ - #31 Name threads of the pysher lib for better debugging, thanks to @[caliloo](https://github.com/caliloo)
 
 ## Version 0.4.2
 ### Fixed:
