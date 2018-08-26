@@ -1,3 +1,6 @@
 *.pyc
 /*.egg-info/
 /dist/
+build
+/examples/need_delete.py
+launch.json
