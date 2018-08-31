@@ -1,8 +1,8 @@
 from setuptools import setup
 
-VERSION = "1.0.1"
+VERSION = "1.2.0b1"
 
-requirements = ["websocket-client>0.48"]
+requirements = ["websocket-client>0.48", "websockets"]
 
 
 def readme():
