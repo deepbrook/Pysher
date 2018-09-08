@@ -73,7 +73,10 @@ MTI License - See LICENSE for details.
 
 Changelog
 ---------
-## 1.0.0
+## Version 1.0.2
+### Fixed
+ - #38 Fix missing `ẁs` arg for websocket app callbacks, thanks to @[squgeim](https://github.com/squgeim)
+## Version 1.0.0
 ### Updated
 - #35 Support websocket-client >0.48 only and fix reconnect error, thanks to @[agronholm](https://github.com/agronholm)
 
@@ -81,7 +84,7 @@ Changelog
 
 ## Version 0.5.0
 ### Added
- - #14 Added support for cluster configuration, thanks t o @[Yvictor](https://github.com/Yvictor)
+ - #14 Added support for cluster configuration, thanks to @[Yvictor](https://github.com/Yvictor)
 
 ### Fixed
  - #30 Require websocket-client version 0.48 or earlier.
