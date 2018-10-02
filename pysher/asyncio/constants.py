@@ -19,6 +19,8 @@ class ConnectionState:
         https://pusher.com/docs/client_api_guide/client_connect#available-states
 
     """
+    #: No websocket connection was instantiated.
+    NOT_INITIALIZED = 'not_initialized'
 
     #: The websocket was instantiated, but the connecting sequence hasn't started.
     INITIALIZED = 'initialized'
@@ -49,6 +51,9 @@ class ConnectionState:
 
     def __init__(self):
         self._state_history = deque([self.INITIALIZED], maxlen=3)
+
+    def __call__(self, *args, **kwargs):
+        return self.current()
 
     def current(self):
         return self._state_history[0]

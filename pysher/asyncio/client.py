@@ -1,20 +1,20 @@
-import hashlib
-import hmac
 import logging
 import json
 import asyncio
 
-from typing import Dict, Optional, Any, Tuple
+from typing import Dict, Optional, Any, Union, Type
 
 import websockets
 
 from pysher.asyncio.connection import PusherWebsocketProtocol
 from pysher.asyncio.channel import AsyncChannel, PrivateChannel, PresenceChannel
-from pysher.asyncio.constants import SYSTEM_CHANNEL
+from pysher.asyncio.constants import SYSTEM_CHANNEL, ConnectionState
 
 log = logging.getLogger(__name__)
 
 VERSION = '0.6.0'
+
+Channel = Union[PrivateChannel, PresenceChannel, AsyncChannel]
 
 
 class Pysher:
@@ -23,18 +23,21 @@ class Pysher:
     Connects to the pusher services and spawns channel objects, which users may
     add callbacks to.
     """
+    #: Client name as we register with Pusher.
     client_id = "Pysher"
+
+    #: Protocol Version.
     protocol = 7
 
-    def __init__(self, key: str or bytes,
+    def __init__(self, key: Union[str, bytes],
                  secret: str="",
                  host: str="ws.pusher.app",
                  secure: bool=True,
                  cluster: Optional[str]=None,
                  custom_port: Optional[int]=None,
                  user_data: Optional[Dict]=None,
-                 loop=None,
-                 custom_auth: Any=None,
+                 loop: Optional[asyncio.AbstractEventLoop]=None,
+                 custom_auth: Optional[Any]=None,
                  **conn_ops: Any):
         """Initialize the Pusher instance.
 
@@ -72,15 +75,33 @@ class Pysher:
         self._run_task = None
 
     def _setup_connection(self):
-        self.connection = websockets.connect(self.url, create_protocol=PusherWebsocketProtocol, **conn_ops)
+        """Create a websocket connection object."""
+        self.connection = websockets.connect(
+            self.url, create_protocol=PusherWebsocketProtocol, **self.conn_ops
+        )
 
     def connect(self):
+        """Create a websocket connection object and request a connection from Pusher."""
         self._setup_connection()
         self._run_task = self.loop.ensure_future(self.run)
 
     def disconnect(self):
+        """Disconnect from Pusher and close the connection."""
         self._run_task.cancel()
         self.connection.close()
+
+    @@property
+    def state(self) -> str:
+        """Get the current connection state.
+
+        :returns:
+            connection state; if no connection object exists, we return
+            :attr:``ConnectionState.NOT_INITIALIZED``.
+        :rtype: str
+        """
+        if self.connection:
+            return self.connection.pusher_state()
+        return ConnectionState.NOT_INITIALIZED
 
     @property
     def key_as_bytes(self) -> bytes:
@@ -91,17 +112,14 @@ class Pysher:
         return self.secret if isinstance(self.secret, bytes) else self.secret.encode('UTF-8')
 
     def _build_url(self, secure: bool=True, custom_port: Optional[int]=None) -> str:
-        path = "/app/{}?client={}&version={}&protocol={}".format(
-            self.key, self.client_id, VERSION, self.protocol
-        )
-
-        proto = "wss" if secure else "ws"
-
+        """Build the url via which we're supposed to contact Pusher."""
+        path = f"/app/{self.key}?client={self.client_id}&version={VERSION}&protocol={self.protocol}"
+        protocol = "wss" if secure else "ws"
         port = custom_port or (443 if secure else 80)
 
-        return "{}://{}:{}{}".format(proto, self.host, port, path)
+        return f"{protocol}://{self.host}:{port}{path}"
 
-    def _configure_channel(self, channel_cls, channel_name):
+    def _configure_channel(self, channel_cls: Type[Channel], channel_name: str) -> Channel:
         """Configure a new channel object."""
         channel_obj = channel_cls(
             channel_name,
@@ -115,7 +133,7 @@ class Pysher:
             channel_obj.user_data = self.user_data
         return channel_obj
 
-    def _generate_subscription_payload_for_channel(self, channel_obj) -> dict:
+    def _generate_subscription_payload_for_channel(self, channel_obj: Channel) -> dict:
         """Generate a subscription payload for the given channel."""
         payload = {'channel': channel_obj.name, 'event': 'pusher:subscribe'}
         if channel_obj.name.startswith(('presence-', 'private')):
@@ -124,7 +142,7 @@ class Pysher:
                 payload.update({'user_data': self.user_data})
         return payload
 
-    def subscribe(self, channel_name: str):
+    def subscribe(self, channel_name: str) -> Channel:
         """Subscribe to the given channel name and spawn a Channel instance."""
         if channel_name.startswith('private-'):
             channel_obj = self._configure_channel(PrivateChannel, channel_name)
@@ -147,10 +165,9 @@ class Pysher:
             self.channels[SYSTEM_CHANNEL] = sys_channel
         while True:
             try:
-                channel, event, data = self.connection.recv()
+                channel, event, data = await self.connection.recv()
             except websockets.ConnectionClosed:
                 break
-            except
             log.info("RECEIVED: {'channel': {!r}, 'event': {!r}, 'data': {!r}")
             try:
                 self.channels[channel].put((channel, event, data))
