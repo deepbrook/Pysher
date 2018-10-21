@@ -91,7 +91,7 @@ class Connection(Thread):
         if reconnect_interval is None:
             reconnect_interval = self.default_reconnect_interval
 
-        self.logger.info("Connection: Reconnect in %s" % reconnect_interval)
+        self.logger.debug("Connection: Reconnect in %s" % reconnect_interval)
         self.reconnect_interval = reconnect_interval
 
         self.needs_reconnect = True
@@ -115,7 +115,7 @@ class Connection(Thread):
         self.socket.run_forever(**self.socket_kwargs)
 
         while self.needs_reconnect and not self.disconnect_called:
-            self.logger.info("Attempting to connect again in %s seconds."
+            self.logger.debug("Attempting to connect again in %s seconds."
                              % self.reconnect_interval)
             self.state = "unavailable"
             time.sleep(self.reconnect_interval)
@@ -135,12 +135,12 @@ class Connection(Thread):
         self._start_timers()
 
     def _on_error(self, error):
-        self.logger.info("Connection: Error - %s" % error)
+        self.logger.error("Connection: Error - %s" % error)
         self.state = "failed"
         self.needs_reconnect = True
 
     def _on_message(self, message):
-        self.logger.info("Connection: Message - %s" % message)
+        self.logger.debug("Connection: Message - %s" % message)
 
         # Stop our timeout timer, since we got some data
         self._stop_timers()
@@ -157,7 +157,7 @@ class Connection(Thread):
                         except Exception:
                             self.logger.exception("Callback raised unhandled")
                 else:
-                    self.logger.info("Connection: Unhandled event")
+                    self.logger.warning("Connection: Unhandled event")
             else:
                 # We've got a channel event.  Lets pass it up to the pusher
                 # so it can be handled by the appropriate channel.
@@ -201,7 +201,7 @@ class Connection(Thread):
         try:
             self.timeout_scheduler.cancel(event)
         except ValueError:
-            self.logger.info('Connection: Scheduling event already cancelled')
+            self.logger.warning('Connection: Scheduling event already cancelled')
 
     def send_event(self, event_name, data, channel_name=None):
         """Send an event to the Pusher server.
@@ -214,14 +214,14 @@ class Connection(Thread):
         if channel_name:
             event['channel'] = channel_name
 
-        self.logger.info("Connection: Sending event - %s" % event)
+        self.logger.debug("Connection: Sending event - %s" % event)
         try:
             self.socket.send(json.dumps(event))
         except Exception as e:
             self.logger.error("Failed send event: %s" % e)
 
     def send_ping(self):
-        self.logger.info("Connection: ping to pusher")
+        self.logger.debug("Connection: ping to pusher")
         try:
             self.socket.send(json.dumps({'event': 'pusher:ping', 'data': ''}))
         except Exception as e:
@@ -230,7 +230,7 @@ class Connection(Thread):
         self.pong_timer = self.timeout_scheduler.enter(self.pong_timeout, 3, self._check_pong)
 
     def send_pong(self):
-        self.logger.info("Connection: pong to pusher")
+        self.logger.debug("Connection: pong to pusher")
         try:
             self.socket.send(json.dumps({'event': 'pusher:pong', 'data': ''}))
         except Exception as e:
@@ -242,7 +242,7 @@ class Connection(Thread):
         if self.pong_received:
             self.pong_received = False
         else:
-            self.logger.info("Did not receive pong in time.  Will attempt to reconnect.")
+            self.logger.warning("Did not receive pong in time. Will attempt to reconnect.")
             self.state = "failed"
             self.reconnect()
 
@@ -271,7 +271,7 @@ class Connection(Thread):
         self._start_timers()
 
     def _pong_handler(self, data):
-        self.logger.info("Connection: pong from pusher")
+        self.logger.debug("Connection: pong from pusher")
         self.pong_received = True
 
     def _pusher_error_handler(self, data):
@@ -287,7 +287,7 @@ class Connection(Thread):
 
                 if (error_code >= 4000) and (error_code <= 4099):
                     # The connection SHOULD NOT be re-established unchanged
-                    self.logger.info("Connection: Error is unrecoverable.  Disconnecting")
+                    self.logger.info("Connection: Error is unrecoverable. Disconnecting")
                     self.disconnect()
                 elif (error_code >= 4100) and (error_code <= 4199):
                     # The connection SHOULD be re-established after backing off
@@ -303,7 +303,7 @@ class Connection(Thread):
             self.logger.error("Connection: No error code supplied")
 
     def _connection_timed_out(self):
-        self.logger.info("Did not receive any data in time.  Reconnecting.")
+        self.logger.info("Did not receive any data in time. Reconnecting.")
         self.state = "failed"
         self.reconnect()
 
