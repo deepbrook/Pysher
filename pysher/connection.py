@@ -186,8 +186,9 @@ class Connection(Thread):
     def _start_timers(self):
         self._stop_timers()
 
-        self.ping_timer = self.timeout_scheduler.enter(self.ping_interval, 1, self.send_ping)
-        self.connection_timer = self.timeout_scheduler.enter(self.connection_timeout, 2, self._connection_timed_out)
+        self.ping_timer = self.timeout_scheduler.enter(self.ping_interval, 1, self.send_ping, argument=())
+        self.connection_timer = self.timeout_scheduler.enter(self.connection_timeout, 2, self._connection_timed_out,
+                                                             argument=())
 
         if not self.timeout_scheduler_thread:
             self.timeout_scheduler_thread = Thread(target=self.timeout_scheduler.run, daemon=True, name="PysherScheduler")
@@ -227,7 +228,7 @@ class Connection(Thread):
         except Exception as e:
             self.logger.error("Failed send ping: %s" % e)
 
-        self.pong_timer = self.timeout_scheduler.enter(self.pong_timeout, 3, self._check_pong)
+        self.pong_timer = self.timeout_scheduler.enter(self.pong_timeout, 3, self._check_pong, argument=())
 
     def send_pong(self):
         self.logger.info("Connection: pong to pusher")
