@@ -191,11 +191,13 @@ class Connection(Thread):
                                                              argument=())
 
         if not self.timeout_scheduler_thread:
-            self.timeout_scheduler_thread = Thread(target=self.timeout_scheduler.run, daemon=True, name="PysherScheduler")
+            self.timeout_scheduler_thread = Thread(target=self.timeout_scheduler.run, name="PysherScheduler")
+            self.timeout_scheduler_thread.daemon = True
             self.timeout_scheduler_thread.start()
 
         elif not self.timeout_scheduler_thread.is_alive():
-            self.timeout_scheduler_thread = Thread(target=self.timeout_scheduler.run, daemon=True, name="PysherScheduler")
+            self.timeout_scheduler_thread = Thread(target=self.timeout_scheduler.run, name="PysherScheduler")
+            self.timeout_scheduler_thread.daemon = True
             self.timeout_scheduler_thread.start()
 
     def _cancel_scheduler_event(self, event):
