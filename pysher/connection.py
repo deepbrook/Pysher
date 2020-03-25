@@ -69,7 +69,7 @@ class Connection(Thread):
         Thread.__init__(self, **thread_kwargs)
         self.daemon = daemon
         self.name = "PysherEventLoop"
-    
+
     def bind(self, event_name, callback, *args, **kwargs):
         """Bind an event to a callback
 
@@ -127,7 +127,7 @@ class Connection(Thread):
 
     def _on_open(self):
         self.logger.info("Connection: Connection opened")
-                
+
         # Send a ping right away to inform that the connection is alive. If you
         # don't do this, it takes the ping interval to subcribe to channel and
         # events
@@ -153,7 +153,7 @@ class Connection(Thread):
                 if params['event'] in self.event_callbacks.keys():
                     for func, args, kwargs in self.event_callbacks[params['event']]:
                         try:
-                            func(params['data'], *args, **kwargs)
+                            func(params.get('data', None), *args, **kwargs)
                         except Exception:
                             self.logger.exception("Callback raised unhandled")
                 else:
