@@ -73,9 +73,18 @@ MTI License - See LICENSE for details.
 
 Changelog
 ---------
+## Version 1.0.5
+### Fixed
+ - #53 Allow data fields to be empty, thanks to @Rubensei
+
+## Version 1.0.4
+### Fixed
+ - Reverts a patch introduced in 1.0.3 
+
 ## Version 1.0.2
 ### Fixed
  - #38 Fix missing `ẁs` arg for websocket app callbacks, thanks to @[squgeim](https://github.com/squgeim)
+
 ## Version 1.0.0
 ### Updated
 - #35 Support websocket-client >0.48 only and fix reconnect error, thanks to @[agronholm](https://github.com/agronholm)
