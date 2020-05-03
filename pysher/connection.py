@@ -163,7 +163,7 @@ class Connection(Thread):
                 # so it can be handled by the appropriate channel.
                 self.event_handler(
                     params['event'],
-                    params['data'],
+                    params.get('data'),
                     params['channel']
                 )
 
