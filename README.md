@@ -1,22 +1,24 @@
 [![PyPI version](https://badge.fury.io/py/Pysher.svg)](https://badge.fury.io/py/Pysher)
 
-Pysher
-=============
+# Pysher
 
-`pysher` is a python module for handling pusher websockets. It is based on @ekulyk's `PythonPusherClient`. This fork is meant as 
-a continuation of the project and is actively maintained. A key difference is the dropped support for pre-3.5 Python versions.
+`pysher` is a python module for handling pusher websockets. It is based on @ekulyk's `PythonPusherClient`. 
+ A key difference is the dropped support for pre-3.5 Python versions.
 
-Installation
-------------
+This fork is meant as a continuation of the project, and is currently in **maintenance mode**.
+
+The author is no longer actively using the library, but PRs including fixes, updates and features
+are welcome and encouraged.
+
+## Installation
 
 Simply run `python setup.py install` - or install via pip `pip install pysher`.
 
 This module depends on websocket-client module available from: <http://github.com/websocket-client/websocket-client>
 
-Example
--------
+## Example
 
-Example of using this pusher client to consume websockets::
+Example of using this pusher client to consume websockets:
 
 ```python
 import pysher
@@ -57,25 +59,26 @@ Sending pusher events to a channel can be done simply using the pusher client su
     p = pusher.Pusher()
     p['mychannel'].trigger('myevent', 'mydata')
     
-Performance
-------
+## Performance
 Pysher relies on websocket-client (websocket-client on pyPI, websocket import in code), which by default does utf5 validation in pure python. This is somewhat cpu hungry for lot's of messages (100's of KB/s or more). To optimize this validation consider installing the wsaccel module from pyPI to let websocket-client use C-compiled utf5 validation methods (websocket does this automatically once wsaccel is present and importable).
 
-Thanks
-------
-A big thanks to @ekulyk for developing the [PythonPusherClient](https://github.com/ekulyk/PythonPusherClient) library.
+## Thanks
+A big thanks to @ekulyk for developing the [PythonPusherClient](https://github.com/ekulyk/PythonPusherClient) library,
+as well as the developers contributing bug-fixes, patches and other PRs to the project <3.
+You can find them listed next to their contributed change in the Changelog section.
 
-
-Copyright
----------
+## Copyright
 
 MTI License - See LICENSE for details.
 
-Changelog
----------
+# Changelog
+## Version 1.0.6
+### Fixed
+ - #55 Allow data fields to be empty for other events, too, thanks to @Rubensei](https://github.com/Rubensei)
+
 ## Version 1.0.5
 ### Fixed
- - #53 Allow data fields to be empty, thanks to @Rubensei
+ - #53 Allow data fields to be empty, thanks to @[Rubensei](https://github.com/Rubensei)
 
 ## Version 1.0.4
 ### Fixed
