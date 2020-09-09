@@ -74,7 +74,7 @@ MTI License - See LICENSE for details.
 # Changelog
 ## Version 1.0.6
 ### Fixed
- - #55 Allow data fields to be empty for other events, too, thanks to @Rubensei](https://github.com/Rubensei)
+ - #55 Allow data fields to be empty for other events, too, thanks to @[Rubensei](https://github.com/Rubensei)
 
 ## Version 1.0.5
 ### Fixed
