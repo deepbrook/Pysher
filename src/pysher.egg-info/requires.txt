@@ -1,0 +1,5 @@
+websocket-client!=0.49
+
+[dev]
+pytest
+tox

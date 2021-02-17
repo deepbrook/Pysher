@@ -1,0 +1,22 @@
+Metadata-Version: 2.1
+Name: pysher
+Version: 1.0.6
+Summary: Pusher websocket client for python, based on Erik Kulyk's PythonPusherClient
+Home-page: UNKNOWN
+Author: Nils Diefenbach
+Author-email: nlsdfnbch.foss@kolabnow.com
+License: MIT
+Description: UNKNOWN
+Keywords: pusher,websocket,client
+Platform: UNKNOWN
+Classifier: 'Development Status :: 4 - Beta'
+Classifier: 'Environment :: Web Environment'
+Classifier: 'License :: OSI Approved :: MIT License'
+Classifier: 'Programming Language :: Python'
+Classifier: 'Programming Language :: Python :: 3.5'
+Classifier: 'Programming Language :: Python :: 3.6'
+Classifier: 'Programming Language :: Python :: 3.7'
+Classifier: 'Topic :: Internet'
+Classifier: 'Topic :: Software Development :: Libraries '
+Classifier: 'Topic :: Software Development :: Libraries :: Python Modules'
+Provides-Extra: dev
