@@ -13,7 +13,7 @@ class Pusher(object):
     client_id = "Pysher"
     protocol = 6
 
-    def __init__(self, key, cluster="", secure=True, secret="", user_data=None, log_level=logging.INFO,
+    def __init__(self, key, cluster="", secure=True, secret="", user_data=None, user_data_string=None, log_level=logging.INFO,
                  daemon=True, port=443, reconnect_interval=10, custom_host="", auto_sub=False,
                  http_proxy_host="", http_proxy_port=0, http_no_proxy=None, http_proxy_auth=None,
                  **thread_kwargs):
@@ -24,6 +24,7 @@ class Pusher(object):
         :param bool secure:
         :param bytes or str secret:
         :param Optional[Dict] user_data:
+        :param str user_data_string:
         :param str log_level:
         :param bool daemon:
         :param int port:
@@ -44,6 +45,7 @@ class Pusher(object):
 
         self.key = key
         self.secret = secret
+        self.user_data_string = user_data_string
 
         self.user_data = user_data or {}
 
@@ -100,6 +102,8 @@ class Pusher(object):
                 data['auth'] = self._generate_auth_token(channel_name)
         else:
             data['auth'] = auth
+            if self.user_data_string is not None and channel_name.startswith('presence-'):
+              data['channel_data'] = self.user_data_string
 
         self.connection.send_event('pusher:subscribe', data)
 
