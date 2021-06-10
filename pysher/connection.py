@@ -120,9 +120,6 @@ class Connection(Thread):
             self.state = "unavailable"
             time.sleep(self.reconnect_interval)
 
-            # We need to set this flag since closing the socket will set it to
-            # false
-            self.socket.keep_running = True
             self.socket.run_forever(**self.socket_kwargs)
 
     def _on_open(self):
