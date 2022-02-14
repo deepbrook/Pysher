@@ -30,7 +30,7 @@ global server
 global exit_code
 
 
-def test_channel_callback(data):
+def channel_callback_test(data):
     global exit_code
     print("Client: %s" % data)
 
@@ -46,7 +46,7 @@ def test_channel_callback(data):
 
 def connect_handler(data):
     channel = client.subscribe("test_channel")
-    channel.bind('test_event', test_channel_callback)
+    channel.bind('test_event', channel_callback_test)
 
 
 def stop_test():

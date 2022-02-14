@@ -1,8 +1,8 @@
+#!/usr/bin/env python
+from setuptools import find_packages
 from setuptools import setup
 
-VERSION = "1.0.6"
-
-requirements = ["websocket-client!=0.49"]
+VERSION = "1.0.7"
 
 
 def readme():
@@ -19,9 +19,13 @@ setup(
     author="Nils Diefenbach",
     author_email="nlsdfnbch.foss@kolabnow.com",
     license="MIT",
-    url="https://github.com/nlsdfnbch/Pysher",
-    install_requires=requirements,
-    packages=["pysher"],
+    url="https://github.com/deepbrook/Pysher",
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
+    install_requires=[
+        "websocket-client!=0.49",
+    ],
+    tests_requires=["autobahn"],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
