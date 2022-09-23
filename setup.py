@@ -24,7 +24,7 @@ setup(
     package_dir={'': 'src'},
     install_requires=[
         "websocket-client!=0.49",
-        "requests==2.26.0",
+        "requests>=2.26.0",
     ],
     tests_requires=["autobahn"],
     classifiers=[
