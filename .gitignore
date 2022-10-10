@@ -1,5 +1,5 @@
 *.pyc
-/*.egg-info/
+*.egg-info/
 /dist/
 build
 /examples/need_delete.py

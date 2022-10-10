@@ -1,5 +1,6 @@
 from pysher.channel import Channel
 from pysher.connection import Connection
+import requests
 import hashlib
 import hmac
 import logging
@@ -13,7 +14,8 @@ class Pusher(object):
     client_id = "Pysher"
     protocol = 6
 
-    def __init__(self, key, cluster="", secure=True, secret="", user_data=None, log_level=logging.INFO,
+    def __init__(self, key, cluster="", secure=True, secret="", auth_endpoint=None, auth_endpoint_headers={},
+                 user_data=None, log_level=logging.INFO,
                  daemon=True, port=443, reconnect_interval=10, custom_host="", auto_sub=False,
                  http_proxy_host="", http_proxy_port=0, http_no_proxy=None, http_proxy_auth=None,
                  **thread_kwargs):
@@ -23,6 +25,8 @@ class Pusher(object):
         :param str cluster:
         :param bool secure:
         :param bytes or str secret:
+        :param Optional[str] auth_endpoint:
+        :param Optional[Dict] auth_endpoint_headers:
         :param Optional[Dict] user_data:
         :param str log_level:
         :param bool daemon:
@@ -44,6 +48,8 @@ class Pusher(object):
 
         self.key = key
         self.secret = secret
+        self.auth_endpoint = auth_endpoint
+        self.auth_endpoint_headers = auth_endpoint_headers
 
         self.user_data = user_data or {}
 
@@ -154,10 +160,26 @@ class Pusher(object):
         :param str channel_name: Name of the channel to generate a signature for.
         :rtype: str
         """
-        subject = "{}:{}".format(self.connection.socket_id, channel_name)
-        h = hmac.new(self.secret_as_bytes, subject.encode('utf-8'), hashlib.sha256)
-        auth_key = "{}:{}".format(self.key, h.hexdigest())
-
+        if not self.secret and not self.auth_endpoint:
+            raise NotImplementedError
+        if self.secret:
+            # Locally signed
+            subject = "{}:{}".format(self.connection.socket_id, channel_name)
+            h = hmac.new(self.secret_as_bytes, subject.encode('utf-8'), hashlib.sha256)
+            auth_key = "{}:{}".format(self.key, h.hexdigest())
+        elif self.auth_endpoint:
+            # Remotely signed
+            request_data = {
+                "channel_name": channel_name,
+                "socket_id": self.connection.socket_id
+            }
+            response = requests.post(
+                self.auth_endpoint,
+                data=request_data,
+                headers=self.auth_endpoint_headers
+            )
+            assert response.status_code == 200, f"Failed to get auth token from {self.auth_endpoint}"
+            auth_key = response.json()["auth"]
         return auth_key
 
     def _generate_presence_token(self, channel_name):
@@ -166,10 +188,27 @@ class Pusher(object):
         :param str channel_name: Name of the channel to generate a signature for.
         :rtype: str
         """
-        subject = "{}:{}:{}".format(self.connection.socket_id, channel_name, json.dumps(self.user_data))
-        h = hmac.new(self.secret_as_bytes, subject.encode('utf-8'), hashlib.sha256)
-        auth_key = "{}:{}".format(self.key, h.hexdigest())
-
+        if not self.secret and not self.auth_endpoint:
+            raise NotImplementedError
+        if self.secret:
+            # Locally signed
+            subject = "{}:{}:{}".format(self.connection.socket_id, channel_name, json.dumps(self.user_data))
+            h = hmac.new(self.secret_as_bytes, subject.encode('utf-8'), hashlib.sha256)
+            auth_key = "{}:{}".format(self.key, h.hexdigest())
+        elif self.auth_endpoint:
+            # Remotely signed
+            request_data = {
+                "channel_name": channel_name,
+                "socket_id": self.connection.socket_id,
+                "user_data": self.user_data,
+            }
+            response = requests.post(
+                self.auth_endpoint,
+                data=request_data,
+                headers=self.auth_endpoint_headers
+            )
+            assert response.status_code == 200, f"Failed to get auth token from {self.auth_endpoint}"
+            auth_key = response.json()["auth"]
         return auth_key
 
     def _build_url(self, secure=True, port=None, custom_host=None):

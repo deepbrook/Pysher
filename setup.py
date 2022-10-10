@@ -2,7 +2,7 @@
 from setuptools import find_packages
 from setuptools import setup
 
-VERSION = "1.0.7"
+VERSION = "1.0.8"
 
 
 def readme():
@@ -24,6 +24,7 @@ setup(
     package_dir={'': 'src'},
     install_requires=[
         "websocket-client!=0.49",
+        "requests>=2.26.0",
     ],
     tests_requires=["autobahn"],
     classifiers=[
