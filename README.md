@@ -80,7 +80,6 @@ MTI License - See LICENSE for details.
 ## Version 1.0.8
 ### Fixed
  - #70 Allow remote authentication without need of secret, thanks to @[Matisilva](https://github.com/matisilva)
- - #55 Allow data fields to be empty for other events, too, thanks to @[Rubensei](https://github.com/Rubensei)
 
 ## Version 1.0.6
 ### Fixed
