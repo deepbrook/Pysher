@@ -109,7 +109,7 @@ class Pusher(object):
 
         self.connection.send_event('pusher:subscribe', data)
 
-        self.channels[channel_name] = Channel(channel_name, self.connection)
+        self.channels[channel_name] = Channel(channel_name, self.connection, auth)
 
         return self.channels[channel_name]
 
@@ -147,12 +147,7 @@ class Pusher(object):
     def _reconnect_handler(self):
         """Handle a reconnect."""
         for channel_name, channel in self.channels.items():
-            data = {'channel': channel_name}
-
-            if channel.auth:
-                data['auth'] = channel.auth
-
-            self.connection.send_event('pusher:subscribe', data)
+            self.subscribe(channel_name, channel.auth)
 
     def _generate_auth_token(self, channel_name):
         """Generate a token for authentication with the given channel.
