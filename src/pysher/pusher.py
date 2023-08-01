@@ -97,6 +97,12 @@ class Pusher(object):
         :param str auth: The token to use if authenticated externally.
         :rtype: pysher.Channel
         """
+        self._subscribe(channel_name, auth)
+        self.channels[channel_name] = Channel(channel_name, self.connection, auth)
+
+        return self.channels[channel_name]
+
+    def _subscribe(self, channel_name, auth=None):
         data = {'channel': channel_name}
         if auth is None:
             if channel_name.startswith('presence-'):
@@ -108,10 +114,6 @@ class Pusher(object):
             data['auth'] = auth
 
         self.connection.send_event('pusher:subscribe', data)
-
-        self.channels[channel_name] = Channel(channel_name, self.connection)
-
-        return self.channels[channel_name]
 
     def unsubscribe(self, channel_name):
         """Unsubscribe from a channel
@@ -147,12 +149,7 @@ class Pusher(object):
     def _reconnect_handler(self):
         """Handle a reconnect."""
         for channel_name, channel in self.channels.items():
-            data = {'channel': channel_name}
-
-            if channel.auth:
-                data['auth'] = channel.auth
-
-            self.connection.send_event('pusher:subscribe', data)
+            self._subscribe(channel_name, channel.auth)
 
     def _generate_auth_token(self, channel_name):
         """Generate a token for authentication with the given channel.
